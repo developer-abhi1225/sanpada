@@ -1,22 +1,22 @@
 import './App.css';
+import { BrowserRouter } from "react-router-dom";
+import { Route, Router, Switch } from "react-router";
+import { createBrowserHistory } from "history";
+import Signup from "./Components/Auth/SignUp"
+const history = createBrowserHistory();
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter history={history}>
+       <Router history={history}>
+          <Switch>
+            <Route exact path={"/signup"} component={Signup} />
+            {/* <Route exact path={"/profile"} component={UserProfileView} /> */}
+            <Route path={"/"} component={Signup} />
+          </Switch>
+        </Router>
+    </BrowserRouter> 
+    
   );
 }
 
