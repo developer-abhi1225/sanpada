@@ -6,18 +6,51 @@ import {
 	Input,
 	Row,
 	Col,
+	InputNumber
   } from "antd";
   import {
 	UserOutlined,
 	MailOutlined,
 	LockOutlined,
 	MobileOutlined,
+	TransactionOutlined
   } from "@ant-design/icons";
 import smallLogo from "../../Assets/logo-small-2.png";
 import "./Signup.css";
 
+const currencyFormatter =  new Intl.NumberFormat('en-IN',{
+	style: 'currency',
+	currency: 'INR',
+	minimumFractionDigits: 0
+  })
 class SignUp extends Component {
+
+	submit = e => {
+		e.preventDefault();
+		this.props.form.validateFields((err, callback) => {
+			if(!err){
+				console.log('values');
+			}
+		});
+	}
+
+	validateConfirmPass = (rule, value, callback) => {
+		const password = this.props.form.getFieldValue("password");
+		if (password && password !== value) {
+		  callback("Password doesnot match");
+		}
+		callback();
+	  };
+	  
+	  validateAge = (rule, value, callback) => {
+		  if(value > 100){
+			callback("Age cannot be greater than 100");
+		  }
+		  callback()
+	  }
+
 	render() {
+		
 		return (
 		  <div className={"login-container"}>
 			<Row type={"flex"} justify={"space-around"}>
@@ -55,12 +88,12 @@ class SignUp extends Component {
 				  {/* ---------------------ROW 1 --------------------- */}
 				  <Row gutter={30}>
 					<Col lg={12} md={12} sm={24}>
-					  <Form.Item label={"First Name"}>
-						{this.props.form.getFieldDecorator("first_name", {
+					  <Form.Item label={"Username"}>
+						{this.props.form.getFieldDecorator("username", {
 						  rules: [
 							{
 							  required: true,
-							  message: "Please enter first name.",
+							  message: "Please enter username.",
 							},
 							{
 							  min: 3,
@@ -75,30 +108,7 @@ class SignUp extends Component {
 					  </Form.Item>
 					</Col>
 					<Col lg={12} md={12} sm={24}>
-					  <Form.Item label={"Last Name"}>
-						{this.props.form.getFieldDecorator("last_name", {
-						  rules: [
-							{
-							  required: true,
-							  message: "Please enter last name.",
-							},
-							{
-							  min: 3,
-							  message: "Mininum 3 characters required.",
-							},
-							{
-							  max: 15,
-							  message: "Maximum 15 characters allowed.",
-							},
-						  ],
-						})(<Input prefix={<UserOutlined />} />)}
-					  </Form.Item>
-					</Col>
-				  </Row>
-				  {/* ---------------------ROW 2 --------------------- */}
-				  <Row gutter={30}>
-					<Col lg={12} md={12} sm={24}>
-					  <Form.Item label={"Email"}>
+					<Form.Item label={"Email"}>
 						{this.props.form.getFieldDecorator("email", {
 						  rules: [
 							{
@@ -109,8 +119,11 @@ class SignUp extends Component {
 						})(<Input type={"email"} prefix={<MailOutlined />} />)}
 					  </Form.Item>
 					</Col>
+				  </Row>
+				  {/* ---------------------ROW 2 --------------------- */}
+				  <Row gutter={30}>
 					<Col lg={12} md={12} sm={24}>
-					  <Form.Item label={"Phone Number"}>
+					<Form.Item label={"Phone Number"}>
 						{this.props.form.getFieldDecorator("phone_no", {
 						  rules: [
 							{
@@ -127,6 +140,21 @@ class SignUp extends Component {
 							},
 						  ],
 						})(<Input type={"number"} prefix={<MobileOutlined />} />)}
+					  </Form.Item>
+					</Col>
+					<Col lg={12} md={12} sm={24}>
+					<Form.Item label={"Age"}>
+						{this.props.form.getFieldDecorator("age", {
+						  rules: [
+							{
+							  required: true,
+							  message: "Please enter age.",
+							},
+							{
+								validator: this.validateAge
+							}
+						  ],
+						})(<Input type={'number'} prefix={<UserOutlined />} />)}
 					  </Form.Item>
 					</Col>
 				  </Row>
@@ -179,10 +207,19 @@ class SignUp extends Component {
 					  </Form.Item>
 					</Col>
 					<Col lg={12} md={12} sm={24}>
-					  <Form.Item label={"Profile pitcure"}>
-						{this.props.form.getFieldDecorator("asset", {
-						  initialValue: {},
-						})(<Input type={"hidden"} />)}
+					  <Form.Item label={"Salary"}>
+						{this.props.form.getFieldDecorator("salary", {
+						  initialValue: "",
+						  rules:[
+							  {
+								required: true,
+								message: "Please enter salary"
+							  }
+							]
+						})(<InputNumber 
+							parser={(value) => parseInt(value.substr(1).replace(/,/g, '')).toString()}
+							formatter={(value) => currencyFormatter.format(value)}
+						 />)}
 					  </Form.Item>
 					</Col>
 				  </Row>
