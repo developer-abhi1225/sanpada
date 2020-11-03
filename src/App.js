@@ -2,7 +2,8 @@ import './App.css';
 import { BrowserRouter } from "react-router-dom";
 import { Route, Router, Switch } from "react-router";
 import { createBrowserHistory } from "history";
-import Signup from "./Components/Auth/SignUp"
+import Signup from "./Components/Auth/SignUp";
+import UserProfileView from "./Components/UserProfile/UserProfile";
 const history = createBrowserHistory();
 
 function App() {
@@ -10,8 +11,7 @@ function App() {
     <BrowserRouter history={history}>
        <Router history={history}>
           <Switch>
-            <Route exact path={"/signup"} component={Signup} />
-            {/* <Route exact path={"/profile"} component={UserProfileView} /> */}
+            <Route exact path={"/profile"} component={UserProfileView} />
             <Route path={"/"} component={Signup} />
           </Switch>
         </Router>

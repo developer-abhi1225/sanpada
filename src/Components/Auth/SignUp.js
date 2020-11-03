@@ -6,14 +6,15 @@ import {
 	Input,
 	Row,
 	Col,
-	InputNumber
+	InputNumber,
+	notification,
+	Radio
   } from "antd";
   import {
 	UserOutlined,
 	MailOutlined,
 	LockOutlined,
 	MobileOutlined,
-	TransactionOutlined
   } from "@ant-design/icons";
 import smallLogo from "../../Assets/logo-small-2.png";
 import "./Signup.css";
@@ -26,10 +27,16 @@ const currencyFormatter =  new Intl.NumberFormat('en-IN',{
 class SignUp extends Component {
 
 	submit = e => {
+		console.log('e',e)
 		e.preventDefault();
-		this.props.form.validateFields((err, callback) => {
+		this.props.form.validateFields((err, values) => {
 			if(!err){
-				console.log('values');
+				notification.success({message: "User Registered successfully"});
+				localStorage.setItem('userDetails',JSON.stringify(values));
+				this.props.history.push('/profile')
+			}
+			else{
+				console.log("err",err	)
 			}
 		});
 	}
@@ -43,12 +50,23 @@ class SignUp extends Component {
 	  };
 	  
 	  validateAge = (rule, value, callback) => {
-		  if(value > 100){
+		  if(value && value > 100){
 			callback("Age cannot be greater than 100");
+		  }
+		  else if(value && value <= 0){
+			callback("Age must be greater than 0");
 		  }
 		  callback()
 	  }
 
+	  validateSalary = (rule, value, callback) => {
+		if(parseInt(value) < 0){
+			callback("Salary must be greater than or equal to 0")
+		}else if(parseInt(value) > 1000000000){
+			callback(`Salary cannot be greater than ${currencyFormatter.format(1000000000)}`)
+		}
+		callback()
+	  }
 	render() {
 		
 		return (
@@ -64,7 +82,7 @@ class SignUp extends Component {
 					className={"login__header"}
 				  >
 					<img className={"header__logo"} alt={"logo"} src={smallLogo} />
-					<span className={"header__signup"}>
+					{/* <span className={"header__signup"}>
 					  Already have an account ?{" "}
 					</span>
 					<Button
@@ -75,7 +93,7 @@ class SignUp extends Component {
 					>
 					  {" "}
 					  Sign In{" "}
-					</Button>
+					</Button> */}
 				  </Row>
 				}
 			  >
@@ -90,6 +108,7 @@ class SignUp extends Component {
 					<Col lg={12} md={12} sm={24}>
 					  <Form.Item label={"Username"}>
 						{this.props.form.getFieldDecorator("username", {
+							initialValue: "Default",
 						  rules: [
 							{
 							  required: true,
@@ -123,23 +142,19 @@ class SignUp extends Component {
 				  {/* ---------------------ROW 2 --------------------- */}
 				  <Row gutter={30}>
 					<Col lg={12} md={12} sm={24}>
-					<Form.Item label={"Phone Number"}>
-						{this.props.form.getFieldDecorator("phone_no", {
+					<Form.Item label={"Password"}>
+						{this.props.form.getFieldDecorator("password", {
 						  rules: [
 							{
 							  required: true,
-							  message: "Please enter phone number.",
+							  message: "Please enter password.",
 							},
 							{
-							  min: 10,
-							  message: "Only 10 digits allowed.",
-							},
-							{
-							  max: 10,
-							  message: "Only 10 digits allowed.",
+							  min: 8,
+							  message: "Password must be atleast of 8 characters",
 							},
 						  ],
-						})(<Input type={"number"} prefix={<MobileOutlined />} />)}
+						})(<Input type={"password"} prefix={<LockOutlined />} />)}
 					  </Form.Item>
 					</Col>
 					<Col lg={12} md={12} sm={24}>
@@ -161,34 +176,39 @@ class SignUp extends Component {
 				  {/* ---------------------ROW 3 --------------------- */}
 				  <Row gutter={30}>
 					<Col lg={12} md={12} sm={24}>
-					  <Form.Item label={"Password"}>
-						{this.props.form.getFieldDecorator("password", {
-						  rules: [
-							{
-							  required: true,
-							  message: "Please enter password.",
-							},
-							{
-							  min: 8,
-							  message: "Password must be atleast of 8 characters",
-							},
-						  ],
-						})(<Input type={"password"} prefix={<LockOutlined />} />)}
+						<Form.Item label={"Phone Number"}>
+							{this.props.form.getFieldDecorator("phone_no", {
+							rules: [
+								{
+								required: true,
+								message: "Please enter phone number.",
+								},
+								{
+								min: 10,
+								message: "Only 10 digits allowed.",
+								},
+								{
+								max: 10,
+								message: "Only 10 digits allowed.",
+								},
+							],
+							})(<Input type={"number"} prefix={<MobileOutlined />} />)}
 					  </Form.Item>
 					</Col>
 					<Col lg={12} md={12} sm={24}>
-					  <Form.Item label={"Confirm password"}>
-						{this.props.form.getFieldDecorator("confirm_password", {
+					  <Form.Item label={"Gender"}>
+						{this.props.form.getFieldDecorator("gender", {
+						initialValue:"M",
 						  rules: [
 							{
 							  required: true,
-							  message: "Please enter password.",
-							},
-							{
-							  validator: this.validateConfirmPass,
+							  message: "Please select gender.",
 							},
 						  ],
-						})(<Input type={"password"} prefix={<LockOutlined />} />)}
+						})(<Radio.Group>
+							<Radio value={"M"}>M</Radio>
+							<Radio value={"F"}>F</Radio>
+						</Radio.Group>)}
 					  </Form.Item>
 					</Col>
 				  </Row>
@@ -198,12 +218,12 @@ class SignUp extends Component {
 					  <Form.Item label={"Address"}>
 						{this.props.form.getFieldDecorator("address", {
 						  rules: [
-							{
-							  required: true,
-							  message: "Please enter address.",
-							},
+							// {
+							//   required: true,
+							//   message: "Please enter address.",
+							// },
 						  ],
-						})(<Input.TextArea />)}
+						})(<Input.TextArea disabled={true} />)}
 					  </Form.Item>
 					</Col>
 					<Col lg={12} md={12} sm={24}>
@@ -214,11 +234,16 @@ class SignUp extends Component {
 							  {
 								required: true,
 								message: "Please enter salary"
+							  },
+							  {
+								validator: this.validateSalary
 							  }
 							]
 						})(<InputNumber 
+							min={0}
+							max={1000000000}
 							parser={(value) => parseInt(value.substr(1).replace(/,/g, '')).toString()}
-							formatter={(value) => currencyFormatter.format(value)}
+							formatter={(value) => parseInt(value) > 0 ? currencyFormatter.format(value) : currencyFormatter.format(0)}
 						 />)}
 					  </Form.Item>
 					</Col>
